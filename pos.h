@@ -63,6 +63,7 @@ private:
     int curid;
 
 public:
+    Command(){};
     Command(_CAMP cp, int bio) : camp(cp), bioelement(bio), curid(0) {}
     inline void report_bio();
     warrior *create();

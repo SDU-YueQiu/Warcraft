@@ -35,7 +35,7 @@ private:
     void useweapon(warrior &b);
 
 public:
-    warrior(_WARRIOR ttype, int curid);
+    warrior(_WARRIOR ttype, int curid, _CAMP tcamp);
     int getATK() const { return ATK; }
     virtual ~warrior(){};
     void march();
@@ -44,6 +44,7 @@ public:
     _CAMP getcamp() { return camp; }
     int getid() { return id; }
     int getpos() { return pos; }
+    void report_march();
 };
 
 class Lion : public warrior
@@ -53,7 +54,7 @@ private:
     int loyalty;
 
 public:
-    Lion(_WARRIOR ttype, int curid);
+    Lion(_WARRIOR ttype, int curid, _CAMP tcamp);
     bool isrun();
     bool check();
 };
@@ -61,7 +62,7 @@ public:
 class Wolf : public warrior
 {
 public:
-    Wolf(_WARRIOR ttype, int curid) : warrior(ttype, curid){};
+    Wolf(_WARRIOR ttype, int curid, _CAMP tcamp) : warrior(ttype, curid, tcamp){};
     void loot();
 };
 

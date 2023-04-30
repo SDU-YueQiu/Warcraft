@@ -4,10 +4,12 @@
 #include "warrior.h"
 
 int CurHour = 0;
+int K;
 City *citys;
 static std::vector<warrior *> AllWarrior;
 static std::vector<Lion *> AllLion;
-static std::vector<Wolf *> AllWolf;
+static std::vector<int> AllWolf;
+Command CmdRed, CmdBlue;
 
 bool cmp(warrior *a, warrior *b)
 {
@@ -34,13 +36,20 @@ void march()
     for (auto x: AllWarrior)
         if (x->vis())
             x->march();
+
 }
 
 void create()
 {
-
+    AllWarrior.push_back(CmdRed.create());
+    if (AllWarrior[AllWarrior.size() - 1]->getcamp() == lion)
+        AllLion.push_back(dynamic_cast<Lion *>(AllWarrior[AllWarrior.size() - 1]));
+    AllWarrior.push_back(CmdBlue.create());
+    if (AllWarrior[AllWarrior.size() - 1]->getcamp() == lion)
+        AllLion.push_back(dynamic_cast<Lion *>(AllWarrior[AllWarrior.size() - 1]));
 }
 
 void game()
 {
+
 }
