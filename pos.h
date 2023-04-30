@@ -1,21 +1,14 @@
 #ifndef _POS_H
 #define _POS_H
 
-#include "warrior.h"
-
-const _WARRIOR makelist[2][5] = {{iceman, lion, wolf, ninja, dragon}, {lion, dragon, ninja, iceman, wolf}};
-
-enum _CAMP
-{
-    RED,
-    BLUE
-};
+#include "declears.h"
 
 class City
 {
 private:
     int RedID;
     int BlueID;
+    int id;
 
 public:
     void fight();

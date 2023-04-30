@@ -5,7 +5,7 @@ extern int CurHour;
 
 void City::fight()
 {
-    
+
 }
 
 inline void Command::report_bio()
