@@ -1,7 +1,7 @@
 #ifndef _WARRIOR_H
 #define _WARRIOR_H
 
-#include "declears.h"
+#include "pos.h"
 #include "vector"
 
 int InitHealth[5];
@@ -29,42 +29,40 @@ private:
     _WARRIOR type;
     int ATK;
     int Health;
-    virtual void useweapon(warrior &b);
-
+    _CAMP camp;
+    int pos;
+    int curweapon;
+    void useweapon(warrior &b);
 
 public:
     warrior(_WARRIOR ttype, int curid);
     int getATK() const { return ATK; }
     virtual ~warrior(){};
-    virtual void march();
-    virtual void fight(warrior &b);
+    void march();
+    int fight(warrior &b);
+    bool &vis() { return visble; }
+    _CAMP getcamp() { return camp; }
+    int getid() { return id; }
+    int getpos() { return pos; }
 };
 
-class lion : public warrior
+class Lion : public warrior
 {
 private:
     bool WillRun;
     int loyalty;
 
 public:
-    lion(int curid);
+    Lion(_WARRIOR ttype, int curid);
     bool isrun();
     bool check();
 };
 
-class wolf : public warrior
+class Wolf : public warrior
 {
 public:
+    Wolf(_WARRIOR ttype, int curid) : warrior(ttype, curid){};
     void loot();
-};
-
-class iceman : public warrior
-{
-public:
-    void march()
-    {
-        if ()
-    }
 };
 
 #endif

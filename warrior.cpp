@@ -1,5 +1,7 @@
 #include "warrior.h"
 
+extern City *citys;
+
 weapon::weapon(_WEAPON type, const warrior &w)
 {
     if (type == sword)
@@ -38,7 +40,7 @@ warrior::warrior(_WARRIOR ttype, int curid) : type(ttype), id(curid), visble(tru
 {
     ATK = InitATK[type];
     Health = InitHealth[type];
-    if (type == dragon)
+    if (type == dragon || type == lion)
         weapons.push_back(weapon(_WEAPON(id % 3), *this));
     if (type == ninja)
     {
@@ -51,5 +53,33 @@ warrior::warrior(_WARRIOR ttype, int curid) : type(ttype), id(curid), visble(tru
 
 void warrior::march()
 {
+    if (type == iceman)
+        Health -= Health / 10;
+    if (Health <= 0)
+    {
+        visble = false;
+        return;
+    }
+    if (camp == RED)
+    {
+        citys[pos].clear();
+        pos++;
+        citys[pos].add(camp, id);
+    }
+}
 
+Lion::Lion(_WARRIOR ttype, int curid) : warrior(ttype, curid) {}
+
+warrior *Command::create()
+{
+    curid++;
+    _WARRIOR wartype = makelist[camp][CurHour % 5];
+    warrior *pt;
+    if (wartype == lion)
+        pt = new Lion(wartype, curid);
+    else if (wartype == wolf)
+        pt = new Wolf(wartype, curid);
+    else
+        pt = new warrior(wartype, curid);
+    return pt;
 }

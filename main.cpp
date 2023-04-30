@@ -1,7 +1,7 @@
-#include <iostream>
-using namespace std;
+#include "warcraft.h"
 
-int main() {
+int main()
+{
 
     return 0;
 }
