@@ -29,7 +29,7 @@ private:
 
 public:
     Command(_CAMP cp, int bio) : camp(cp), bioelement(bio) {}
-    void report_bio();
+    inline void report_bio();
 };
 
 
