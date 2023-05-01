@@ -54,7 +54,6 @@ private:
     int id;
 
 public:
-    void fight();
     void clear()
     {
         RedID = 0;
@@ -67,6 +66,9 @@ public:
         else
             BlueID = id;
     }
+    int getid() { return id; }
+    int redid() { return RedID; }
+    int blueid() { return BlueID; }
 };
 
 class Command

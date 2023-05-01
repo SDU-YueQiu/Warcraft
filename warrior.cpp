@@ -120,3 +120,10 @@ void Wolf::loot(warrior *b)
     printf("%03d:35 %s wolf %d took %d %s from %s %s %d in city %d\n",
            CurHour, CampName[getcamp()], getid(), lootnum, WeaponName[Fid], CampName[b->getcamp()], WarriorName[b->gettype()], b->getid(), getpos());
 }
+
+int warrior::fight(warrior &b)
+{
+    sortWeapon();
+    b.sortWeapon();
+
+}

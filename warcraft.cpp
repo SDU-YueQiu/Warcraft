@@ -5,7 +5,7 @@
 
 int CurHour = 0;
 int K;
-City *citys;
+std::vector<City> citys;
 static std::vector<warrior *> AllWarrior;
 static std::vector<Lion *> AllLion;
 Command CmdRed, CmdBlue;
@@ -51,7 +51,19 @@ void create()
         AllLion.push_back(dynamic_cast<Lion *>(AllWarrior[AllWarrior.size() - 1]));
 }
 
+void fight()
+{
+    for (auto x: citys)
+    {
+        if (x.redid() * x.blueid() == 0)
+            continue;
+        if (x.getid() % 2 == 0)
+            AllWarrior[x.redid()]->fight(*AllWarrior[x.blueid()]);
+        else
+            AllWarrior[x.blueid()]->fight(*AllWarrior[x.redid()]);
+    }
+}
+
 void game()
 {
-
 }
