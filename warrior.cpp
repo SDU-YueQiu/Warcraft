@@ -4,6 +4,7 @@
 extern City *citys;
 extern int K;
 extern int N;
+extern int M;
 extern const char WarriorName[5][10];
 extern bool gameend;
 
@@ -100,8 +101,16 @@ Lion::Lion(_WARRIOR ttype, int curid, _CAMP tcamp) : warrior(ttype, curid, tcamp
 
 warrior *Command::create()
 {
+    if(isStop)
+        return nullptr;
     curid++;
     _WARRIOR wartype = makelist[camp][CurHour % 5];
+    bioelement -= InitHealth[wartype];
+    if (bioelement < 0)
+    {
+        isStop= true;
+        return nullptr;
+    }
     warrior *pt;
     if (wartype == lion)
         pt = new Lion(wartype, curid, camp);
@@ -289,4 +298,12 @@ bool Lion::check()
 bool Lion::isrun()
 {
     return WillRun;
+}
+
+void Command::init(_CAMP c)
+{
+    camp = c;
+    bioelement = M;
+    curid = 0;
+    isStop = false;
 }

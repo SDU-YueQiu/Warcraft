@@ -56,12 +56,20 @@ void march()
 
 void create()
 {
-    AllWarrior.push_back(CmdRed.create());
-    if (AllWarrior[AllWarrior.size() - 1]->gettype() == lion)
-        AllLion.push_back(dynamic_cast<Lion *>(AllWarrior[AllWarrior.size() - 1]));
-    AllWarrior.push_back(CmdBlue.create());
-    if (AllWarrior[AllWarrior.size() - 1]->gettype() == lion)
-        AllLion.push_back(dynamic_cast<Lion *>(AllWarrior[AllWarrior.size() - 1]));
+    warrior *nw = CmdRed.create();
+    if (nw != nullptr)
+    {
+        AllWarrior.push_back(nw);
+        if (AllWarrior[AllWarrior.size() - 1]->gettype() == lion)
+            AllLion.push_back(dynamic_cast<Lion *>(AllWarrior[AllWarrior.size() - 1]));
+    }
+    nw = CmdBlue.create();
+    if (nw != nullptr)
+    {
+        AllWarrior.push_back(nw);
+        if (AllWarrior[AllWarrior.size() - 1]->gettype() == lion)
+            AllLion.push_back(dynamic_cast<Lion *>(AllWarrior[AllWarrior.size() - 1]));
+    }
     sortwarrior();
 }
 
@@ -109,37 +117,69 @@ inline void rpt_weapon()
             x->report_weapon();
 }
 
+inline bool checktime(int minu)
+{
+    int hour = T / 60;
+    int minute = T % 60;
+    if (CurHour < hour)
+        return false;
+    if (CurHour > hour || minu > minute)
+    {
+        gameend = true;
+        return true;
+    }
+}
+
 void game()
 {
     while (!gameend)
     {
         create();
+        if (checktime(0))
+            break;
         delete_lion();
+        if (checktime(5))
+            break;
         march();
+        if (checktime(10))
+            break;
         if (gameend)
             break;
         wolf_loot();
+        if (checktime(35))
+            break;
         fight();
+        if (checktime(40))
+            break;
         rpt_bio();
+        if (checktime(50))
+            break;
         rpt_weapon();
+        if (checktime(55))
+            break;
+        ++CurHour;
     }
 }
 
 void init()
 {
     citys.clear();
+    for (auto x: AllWarrior)
+        delete x;
     AllWarrior.clear();
     AllLion.clear();
     gameend = false;
-    std::cin >> N >> M >> K >> T;
+    std::cin >> M >> N >> K >> T;
     for (int i = 0; i < 5; ++i)
         std::cin >> InitHealth[i];
     for (int i = 0; i < 5; ++i)
         std::cin >> InitATK[i];
+    CmdRed.init(RED);
+    CmdBlue.init(BLUE);
     CurHour = 0;
     citys.push_back(City(0));
     for (int i = 1; i <= N; ++i)
         citys.push_back(City(i));
     citys.push_back(City(N + 1));
-    printf("Case %d", ++cnt);
+    printf("Case %d:\n", ++cnt);
 }

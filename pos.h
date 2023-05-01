@@ -76,12 +76,13 @@ private:
     _CAMP camp;
     int bioelement;
     int curid;
-
+    bool isStop;
 public:
     Command(){};
     Command(_CAMP cp, int bio) : camp(cp), bioelement(bio), curid(0) {}
     void report_bio();
     warrior *create();
+    void init(_CAMP);
 };
 
 
