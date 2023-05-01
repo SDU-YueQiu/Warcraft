@@ -17,10 +17,13 @@ private:
     int id;
 
 public:
-    weapon(_WEAPON, const warrior &);
+    weapon(_WEAPON);
     bool operator<(const weapon &b) const;
     const int getID() { return id; }
     const int getNum() { return NumOfUse; }
+    const int getATK2o(const warrior &a);
+    const int getATK2s(const warrior &a);
+    void use() { --NumOfUse; }
 };
 
 class warrior
@@ -43,22 +46,20 @@ public:
     virtual ~warrior(){};
     void march();
     int fight(warrior &b);
-    bool &vis() { return visble; }
+    const bool &vis() const { return visble; }
     _CAMP getcamp() { return camp; }
-    int getid() { return id; }
-    int getpos() { return pos; }
+    const int getid() const { return id; }
+    const int getpos() const { return pos; }
     void report_march();
-    const _WARRIOR &gettype() { return type; }
+    const _WARRIOR &gettype() const { return type; }
     weapon belooted();
     weapon &firstweapon() { return weapons[0]; }
-    int weaponNum() { return weapons.size(); }
-    void sortWeapon()
-    {
-        std::sort(weapons.begin(), weapons.end());
-        while (weapons.size() > 0 && weapons[weapons.size() - 1].getNum() == 0)
-            weapons.pop_back();
-    }
+    const int weaponNum() const { return weapons.size(); }
+    void sortWeapon();
     void addWeapon(const weapon &w) { weapons.push_back(w); }
+    bool emptyWeapon();
+    bool sumAtk();
+    void beAtk(int);
 };
 
 class Lion : public warrior
