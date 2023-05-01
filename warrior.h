@@ -1,6 +1,7 @@
 #ifndef _WARRIOR_H
 #define _WARRIOR_H
 
+#include "algorithm"
 #include "pos.h"
 #include "vector"
 
@@ -18,6 +19,8 @@ private:
 public:
     weapon(_WEAPON, const warrior &);
     bool operator<(const weapon &b) const;
+    const int getID() { return id; }
+    const int getNum() { return NumOfUse; }
 };
 
 class warrior
@@ -31,7 +34,7 @@ private:
     int Health;
     _CAMP camp;
     int pos;
-    int curweapon;
+    int curweaponID;
     void useweapon(warrior &b);
 
 public:
@@ -45,6 +48,17 @@ public:
     int getid() { return id; }
     int getpos() { return pos; }
     void report_march();
+    const _WARRIOR &gettype() { return type; }
+    weapon belooted();
+    weapon &firstweapon() { return weapons[0]; }
+    int weaponNum() { return weapons.size(); }
+    void sortWeapon()
+    {
+        std::sort(weapons.begin(), weapons.end());
+        while (weapons.size() > 0 && weapons[weapons.size() - 1].getNum() == 0)
+            weapons.pop_back();
+    }
+    void addWeapon(const weapon &w) { weapons.push_back(w); }
 };
 
 class Lion : public warrior
@@ -63,7 +77,7 @@ class Wolf : public warrior
 {
 public:
     Wolf(_WARRIOR ttype, int curid, _CAMP tcamp) : warrior(ttype, curid, tcamp){};
-    void loot();
+    void loot(warrior *b);
 };
 
 #endif

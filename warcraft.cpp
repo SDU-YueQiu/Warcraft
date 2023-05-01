@@ -8,7 +8,6 @@ int K;
 City *citys;
 static std::vector<warrior *> AllWarrior;
 static std::vector<Lion *> AllLion;
-static std::vector<int> AllWolf;
 Command CmdRed, CmdBlue;
 
 bool cmp(warrior *a, warrior *b)
@@ -36,7 +35,10 @@ void march()
     for (auto x: AllWarrior)
         if (x->vis())
             x->march();
-
+    std::sort(AllWarrior.begin(), AllWarrior.end(), cmp);
+    for (auto x: AllWarrior)
+        if (x->vis())
+            x->report_march();
 }
 
 void create()

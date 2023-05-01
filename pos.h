@@ -11,6 +11,12 @@ enum _WARRIOR
     ninja,
     dragon
 };
+const char WarriorName[5][10] = {
+        "iceman",
+        "lion",
+        "wolf",
+        "ninja",
+        "dragon"};
 
 enum _WEAPON
 {
@@ -18,11 +24,19 @@ enum _WEAPON
     bomb,
     arrow
 };
+const char WeaponName[3][10] = {
+        "sword",
+        "bomb",
+        "arrow"};
 enum _CAMP
 {
     RED,
     BLUE
 };
+const char CampName[2][5] = {
+        "red",
+        "blue"};
+
 
 const _WARRIOR makelist[2][5] = {{iceman, lion, wolf, ninja, dragon}, {lion, dragon, ninja, iceman, wolf}};
 class Command;

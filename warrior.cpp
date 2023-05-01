@@ -4,6 +4,8 @@
 extern City *citys;
 extern int K;
 
+extern const char WarriorName[5][10];
+
 weapon::weapon(_WEAPON type, const warrior &w)
 {
     if (type == sword)
@@ -72,25 +74,8 @@ void warrior::march()
 
 void warrior::report_march()
 {
-    char wartypename[10];
-    switch (type) {
-        case dragon:
-            strcpy(wartypename, "dragon");
-            break;
-        case ninja:
-            strcpy(wartypename, "ninja");
-            break;
-        case iceman:
-            strcpy(wartypename, "iceman");
-            break;
-        case lion:
-            strcpy(wartypename, "lion");
-            break;
-        case wolf:
-            strcpy(wartypename, "wolf");
-            break;
-    }
-    printf("%03d:10 %s %s %d marched to city %d with %d elements and force %d\n",CurHour, camp == RED ? "red" : "blue", wartypename, id);
+    printf("%03d:10 %s %s %d marched to city %d with %d elements and force %d\n",
+           CurHour, CampName[camp], WarriorName[type], id, pos, ATK, Health);
 }
 
 Lion::Lion(_WARRIOR ttype, int curid, _CAMP tcamp) : warrior(ttype, curid, tcamp) {}
@@ -106,26 +91,32 @@ warrior *Command::create()
         pt = new Wolf(wartype, curid, camp);
     else
         pt = new warrior(wartype, curid, camp);
-    char wartypename[10];
-    switch (wartype) {
-        case dragon:
-            strcpy(wartypename, "dragon");
-            break;
-        case ninja:
-            strcpy(wartypename, "ninja");
-            break;
-        case iceman:
-            strcpy(wartypename, "iceman");
-            break;
-        case lion:
-            strcpy(wartypename, "lion");
-            break;
-        case wolf:
-            strcpy(wartypename, "wolf");
-            break;
-    }
-    printf("%03d:00 %s %s %d born\n", CurHour, camp == RED ? "red" : "blue", wartypename, curid);
+    printf("%03d:00 %s %s %d born\n", CurHour, CampName[camp], WarriorName[pt->gettype()], curid);
     if (wartype == lion)
         printf("Its loyalty is %d\n", K);
     return pt;
+}
+
+weapon warrior::belooted()
+{
+    weapon looted = weapons[0];
+    weapons.erase(weapons.begin());
+    return looted;
+}
+
+void Wolf::loot(warrior *b)
+{
+    if (b->gettype() == wolf)
+        return;
+    b->sortWeapon();
+    int Fid = b->firstweapon().getID();
+    int lootnum = 0;
+    while (weaponNum() < 10 && b->firstweapon().getID() == Fid)
+    {
+        ++lootnum;
+        addWeapon(b->belooted());
+    }
+    sortWeapon();
+    printf("%03d:35 %s wolf %d took %d %s from %s %s %d in city %d\n",
+           CurHour, CampName[getcamp()], getid(), lootnum, WeaponName[Fid], CampName[b->getcamp()], WarriorName[b->gettype()], b->getid(), getpos());
 }
