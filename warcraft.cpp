@@ -4,11 +4,12 @@
 #include "warrior.h"
 
 int CurHour = 0;
-int K;
+int M, N, K, T;
 std::vector<City> citys;
 static std::vector<warrior *> AllWarrior;
 static std::vector<Lion *> AllLion;
 Command CmdRed, CmdBlue;
+bool gameend = false;
 
 bool cmp(warrior *a, warrior *b)
 {
@@ -26,8 +27,13 @@ void delete_lion()
             if (x->isrun())
             {
                 printf("%03d:05 %s lion %d ran away\n", CurHour, (x->getcamp() == RED ? "red" : "blue"), x->getid());
-                x->vis() = false;
+                x->died();
             }
+}
+
+inline void sortwarrior()
+{
+    std::sort(AllWarrior.begin() + 1, AllWarrior.end(), cmp);
 }
 
 void march()
@@ -35,7 +41,7 @@ void march()
     for (auto x: AllWarrior)
         if (x->vis())
             x->march();
-    std::sort(AllWarrior.begin(), AllWarrior.end(), cmp);
+    sortwarrior();
     for (auto x: AllWarrior)
         if (x->vis())
             x->report_march();
@@ -44,11 +50,12 @@ void march()
 void create()
 {
     AllWarrior.push_back(CmdRed.create());
-    if (AllWarrior[AllWarrior.size() - 1]->getcamp() == lion)
+    if (AllWarrior[AllWarrior.size() - 1]->gettype() == lion)
         AllLion.push_back(dynamic_cast<Lion *>(AllWarrior[AllWarrior.size() - 1]));
     AllWarrior.push_back(CmdBlue.create());
-    if (AllWarrior[AllWarrior.size() - 1]->getcamp() == lion)
+    if (AllWarrior[AllWarrior.size() - 1]->gettype() == lion)
         AllLion.push_back(dynamic_cast<Lion *>(AllWarrior[AllWarrior.size() - 1]));
+    sortwarrior();
 }
 
 void fight()
@@ -64,6 +71,49 @@ void fight()
     }
 }
 
+void wolf_loot()
+{
+    for (auto x: AllWarrior)
+        if (x->vis() && x->gettype() == wolf)
+        {
+            Wolf *pw = dynamic_cast<Wolf *>(x);
+            warrior *po;
+            if (pw->getcamp() == BLUE)
+                po = AllWarrior[citys[pw->getpos()].redid()];
+            else
+                po = AllWarrior[citys[pw->getpos()].blueid()];
+            if (po->gettype() == nulwar)
+                continue;
+            else
+                pw->loot(po);
+        }
+}
+
+inline void rpt_bio()
+{
+    CmdRed.report_bio();
+    CmdBlue.report_bio();
+}
+
+inline void rpt_weapon()
+{
+    for (auto x: AllWarrior)
+        if (x->vis())
+            x->report_weapon();
+}
+
 void game()
 {
+    while (!gameend)
+    {
+        create();
+        delete_lion();
+        march();
+        if (gameend)
+            break;
+        wolf_loot();
+        fight();
+        rpt_bio();
+        rpt_weapon();
+    }
 }

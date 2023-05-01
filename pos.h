@@ -9,7 +9,8 @@ enum _WARRIOR
     lion,
     wolf,
     ninja,
-    dragon
+    dragon,
+    nulwar
 };
 const char WarriorName[5][10] = {
         "iceman",
@@ -59,12 +60,12 @@ public:
         RedID = 0;
         BlueID = 0;
     }
-    void add(_CAMP camp, int id)
+    void add(_CAMP camp, int tid)
     {
         if (camp == RED)
-            RedID = id;
+            RedID = tid;
         else
-            BlueID = id;
+            BlueID = tid;
     }
     int getid() { return id; }
     int redid() { return RedID; }

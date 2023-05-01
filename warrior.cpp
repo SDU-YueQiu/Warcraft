@@ -1,10 +1,11 @@
 #include "warrior.h"
 #include "cstdio"
-#include "cstring"
+
 extern City *citys;
 extern int K;
-
+extern int N;
 extern const char WarriorName[5][10];
+extern bool gameend;
 
 weapon::weapon(_WEAPON type)
 {
@@ -42,6 +43,9 @@ bool weapon::operator<(const weapon &b) const
 
 warrior::warrior(_WARRIOR ttype, int curid, _CAMP tcamp) : type(ttype), id(curid), visble(true), camp(tcamp)
 {
+    if (type == nulwar)
+        return;
+    pos = (camp == RED ? 0 : N);
     ATK = InitATK[type];
     Health = InitHealth[type];
     if (type == dragon || type == lion)
@@ -74,11 +78,17 @@ void warrior::march()
 
 void warrior::report_march()
 {
-    printf("%03d:10 %s %s %d marched to city %d with %d elements and force %d\n",
-           CurHour, CampName[camp], WarriorName[type], id, pos, ATK, Health);
+    if ((camp == RED && pos == N) || (camp == BLUE && pos == 0))
+    {
+        gameend = true;
+        printf("%03d:10 %s %s %d reached %s headquarter with %d elements and force %d",
+               CurHour, CampName[camp], WarriorName[type], id, (camp == RED ? "blue" : "red"), Health, ATK);
+    } else
+        printf("%03d:10 %s %s %d marched to city %d with %d elements and force %d\n",
+               CurHour, CampName[camp], WarriorName[type], id, pos, ATK, Health);
 }
 
-Lion::Lion(_WARRIOR ttype, int curid, _CAMP tcamp) : warrior(ttype, curid, tcamp) {}
+Lion::Lion(_WARRIOR ttype, int curid, _CAMP tcamp) : warrior(ttype, curid, tcamp), loyalty(K), WillRun(false) {}
 
 warrior *Command::create()
 {
@@ -209,7 +219,7 @@ void warrior::useweapon(warrior &b)
 }
 
 
-int warrior::fight(warrior &b)
+void warrior::fight(warrior &b)
 {
     sortWeapon();
     b.sortWeapon();
@@ -223,18 +233,51 @@ int warrior::fight(warrior &b)
             b.useweapon(*this);
         ++time;
     }
-    ending end= isend(*this,b);
-    if(end==die)
+    ending end = isend(*this, b);
+    if (end == die)
     {
         warrior &winner = (this->vis() ? *this : b);
         warrior &died = (this->vis() ? b : *this);
-        printf("%03d:40 %s %s %d killed %s %s %d in city %d remaining %d elements",
+        printf("%03d:40 %s %s %d killed %s %s %d in city %d remaining %d elements\n",
                CurHour, CampName[winner.getcamp()], WarriorName[winner.gettype()], winner.getid(),
                CampName[died.getcamp()], WarriorName[died.gettype()], died.getid(),
                pos, Health);
-    }
-    else if(end==alldie)
+        if (winner.type == dragon)
+            printf("%03d:40 %s dragon %d yelled in city %d\n",
+                   CurHour, CampName[winner.camp], winner.id, pos);
+    } else if (end == alldie)
     {
-        
+        warrior &redw = (this->camp == RED ? *this : b);
+        warrior &bluew = (this->camp == BLUE ? *this : b);
+        printf("%03d:40 both red %s %d and blue %s %d died in city %d\n",
+               CurHour, WarriorName[redw.type], redw.id, WarriorName[bluew.type], bluew.id, pos);
+    } else
+    {
+        warrior &redw = (this->camp == RED ? *this : b);
+        warrior &bluew = (this->camp == BLUE ? *this : b);
+        printf("%03d:40 both red %s %d and blue %s %d were alive in city %d\n",
+               CurHour, WarriorName[redw.type], redw.id, WarriorName[bluew.type], bluew.id, pos);
     }
+}
+
+void warrior::report_weapon()
+{
+    int sum[3] = {0};
+    sortWeapon();
+    for (auto x: weapons)
+        sum[x.getID()]++;
+    printf("%03d:55 %s %s %d has %d sword %d bomb %d arrow and %d elements\n",
+           CurHour, CampName[camp], WarriorName[type], id, sum[sword], sum[bomb], sum[arrow], Health);
+}
+
+bool Lion::check()
+{
+    loyalty -= K;
+    if (loyalty <= 0)
+        WillRun = true;
+}
+
+bool Lion::isrun()
+{
+    return WillRun;
 }

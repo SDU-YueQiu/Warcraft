@@ -45,8 +45,9 @@ public:
     int getATK() const { return ATK; }
     virtual ~warrior(){};
     void march();
-    int fight(warrior &b);
+    void fight(warrior &b);
     const bool &vis() const { return visble; }
+    void died() { visble = false; }
     _CAMP getcamp() { return camp; }
     const int getid() const { return id; }
     const int getpos() const { return pos; }
@@ -60,6 +61,7 @@ public:
     bool emptyWeapon();
     bool sumAtk();
     void beAtk(int);
+    void report_weapon();
 };
 
 class Lion : public warrior
