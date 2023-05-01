@@ -55,11 +55,8 @@ private:
     int id;
 
 public:
-    void clear()
-    {
-        RedID = 0;
-        BlueID = 0;
-    }
+    void clearRED() { RedID = 0; }
+    void clearBLUE() { BlueID = 0; }
     void add(_CAMP camp, int tid)
     {
         if (camp == RED)
@@ -70,6 +67,7 @@ public:
     int getid() { return id; }
     int redid() { return RedID; }
     int blueid() { return BlueID; }
+    City(int i) : id(i) {}
 };
 
 class Command
@@ -82,7 +80,7 @@ private:
 public:
     Command(){};
     Command(_CAMP cp, int bio) : camp(cp), bioelement(bio), curid(0) {}
-    inline void report_bio();
+    void report_bio();
     warrior *create();
 };
 

@@ -1,5 +1,6 @@
 #include "algorithm"
 #include "cstdio"
+#include "iostream"
 #include "pos.h"
 #include "warrior.h"
 
@@ -10,6 +11,9 @@ static std::vector<warrior *> AllWarrior;
 static std::vector<Lion *> AllLion;
 Command CmdRed, CmdBlue;
 bool gameend = false;
+int cnt = 0;
+extern int InitHealth[5];
+extern int InitATK[5];
 
 bool cmp(warrior *a, warrior *b)
 {
@@ -45,6 +49,9 @@ void march()
     for (auto x: AllWarrior)
         if (x->vis())
             x->report_march();
+    for (auto x: AllLion)
+        if (x->vis())
+            x->check();
 }
 
 void create()
@@ -116,4 +123,23 @@ void game()
         rpt_bio();
         rpt_weapon();
     }
+}
+
+void init()
+{
+    citys.clear();
+    AllWarrior.clear();
+    AllLion.clear();
+    gameend = false;
+    std::cin >> N >> M >> K >> T;
+    for (int i = 0; i < 5; ++i)
+        std::cin >> InitHealth[i];
+    for (int i = 0; i < 5; ++i)
+        std::cin >> InitATK[i];
+    CurHour = 0;
+    citys.push_back(City(0));
+    for (int i = 1; i <= N; ++i)
+        citys.push_back(City(i));
+    citys.push_back(City(N + 1));
+    printf("Case %d", ++cnt);
 }

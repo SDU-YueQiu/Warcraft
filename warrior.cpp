@@ -7,6 +7,9 @@ extern int N;
 extern const char WarriorName[5][10];
 extern bool gameend;
 
+int InitHealth[5];
+int InitATK[5];
+
 weapon::weapon(_WEAPON type)
 {
     if (type == sword)
@@ -70,15 +73,20 @@ void warrior::march()
     }
     if (camp == RED)
     {
-        citys[pos].clear();
+        citys[pos].clearRED();
         pos++;
+        citys[pos].add(camp, id);
+    } else
+    {
+        citys[pos].clearBLUE();
+        pos--;
         citys[pos].add(camp, id);
     }
 }
 
 void warrior::report_march()
 {
-    if ((camp == RED && pos == N) || (camp == BLUE && pos == 0))
+    if ((camp == RED && pos == N + 1) || (camp == BLUE && pos == 0))
     {
         gameend = true;
         printf("%03d:10 %s %s %d reached %s headquarter with %d elements and force %d",
@@ -275,6 +283,7 @@ bool Lion::check()
     loyalty -= K;
     if (loyalty <= 0)
         WillRun = true;
+    return check();
 }
 
 bool Lion::isrun()

@@ -4,4 +4,7 @@
 #include "pos.h"
 #include "warrior.h"
 
+void game();
+void init();
+
 #endif

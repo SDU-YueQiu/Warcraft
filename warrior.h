@@ -5,9 +5,6 @@
 #include "pos.h"
 #include "vector"
 
-int InitHealth[5];
-int InitATK[5];
-
 class weapon
 {
 private:
