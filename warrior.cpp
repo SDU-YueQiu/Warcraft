@@ -49,7 +49,7 @@ warrior::warrior(_WARRIOR ttype, int curid, _CAMP tcamp) : type(ttype), id(curid
 {
     if (type == nulwar)
         return;
-    pos = (camp == RED ? 0 : N);
+    pos = (camp == RED ? 0 : N + 1);
     ATK = InitATK[type];
     Health = InitHealth[type];
     if (type == dragon || type == lion)
@@ -101,16 +101,16 @@ Lion::Lion(_WARRIOR ttype, int curid, _CAMP tcamp) : warrior(ttype, curid, tcamp
 
 warrior *Command::create()
 {
-    if(isStop)
+    if (isStop)
         return nullptr;
     curid++;
     _WARRIOR wartype = makelist[camp][CurHour % 5];
-    bioelement -= InitHealth[wartype];
-    if (bioelement < 0)
+    if (bioelement - InitHealth[wartype] < 0)
     {
-        isStop= true;
+        isStop = true;
         return nullptr;
     }
+    bioelement -= InitHealth[wartype];
     warrior *pt;
     if (wartype == lion)
         pt = new Lion(wartype, curid, camp);
@@ -240,7 +240,6 @@ void warrior::fight(warrior &b)
 {
     sortWeapon();
     b.sortWeapon();
-    _CAMP initialCamp = getcamp();
     int time = 1;
     while (isend(*this, b) == con)
     {
@@ -287,12 +286,11 @@ void warrior::report_weapon()
            CurHour, CampName[camp], WarriorName[type], id, sum[sword], sum[bomb], sum[arrow], Health);
 }
 
-bool Lion::check()
+void Lion::check()
 {
     loyalty -= K;
     if (loyalty <= 0)
         WillRun = true;
-    return check();
 }
 
 bool Lion::isrun()

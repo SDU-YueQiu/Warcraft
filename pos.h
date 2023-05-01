@@ -5,19 +5,19 @@ extern int CurHour;
 
 enum _WARRIOR
 {
+    dragon,
+    ninja,
     iceman,
     lion,
     wolf,
-    ninja,
-    dragon,
     nulwar
 };
 const char WarriorName[5][10] = {
+        "dragon",
+        "ninja",
         "iceman",
         "lion",
-        "wolf",
-        "ninja",
-        "dragon"};
+        "wolf"};
 
 enum _WEAPON
 {
@@ -39,7 +39,9 @@ const char CampName[2][5] = {
         "blue"};
 
 
-const _WARRIOR makelist[2][5] = {{iceman, lion, wolf, ninja, dragon}, {lion, dragon, ninja, iceman, wolf}};
+const _WARRIOR makelist[2][5] = {
+        {iceman, lion, wolf, ninja, dragon},
+        {lion, dragon, ninja, iceman, wolf}};
 class Command;
 class City;
 class warrior;
@@ -67,7 +69,7 @@ public:
     int getid() { return id; }
     int redid() { return RedID; }
     int blueid() { return BlueID; }
-    City(int i) : id(i) {}
+    City(int i) : id(i),RedID(0),BlueID(0) {}
 };
 
 class Command
@@ -77,6 +79,7 @@ private:
     int bioelement;
     int curid;
     bool isStop;
+
 public:
     Command(){};
     Command(_CAMP cp, int bio) : camp(cp), bioelement(bio), curid(0) {}

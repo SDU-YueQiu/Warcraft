@@ -70,7 +70,7 @@ private:
 public:
     Lion(_WARRIOR ttype, int curid, _CAMP tcamp);
     bool isrun();
-    bool check();
+    void check();
 };
 
 class Wolf : public warrior
