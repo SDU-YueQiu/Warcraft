@@ -90,7 +90,7 @@ void warrior::report_march()
     if ((camp == RED && pos == N + 1) || (camp == BLUE && pos == 0))
     {
         isGameEnd = true;
-        printf("%03d:10 %s %s %d reached %s headquarter with %d elements and force %d",
+        printf("%03d:10 %s %s %d reached %s headquarter with %d elements and force %d\n",
                CurHour, CampName[camp], WarriorName[type], id, (camp == RED ? "blue" : "red"), Health, ATK);
     } else
         printf("%03d:10 %s %s %d marched to city %d with %d elements and force %d\n",
@@ -109,12 +109,12 @@ weapon warrior::belooted()
 
 void Wolf::loot(warrior *b)
 {
-    if (b->gettype() == wolf)
+    if (b->gettype() == wolf || b->emptyWeapon())
         return;
     b->sortWeapon();
     int Fid = b->firstweapon().getID();
     int lootnum = 0;
-    while (weaponNum() < 10 && b->firstweapon().getID() == Fid)
+    while (weaponNum() < 10 && !b->emptyWeapon() && b->firstweapon().getID() == Fid)
     {
         ++lootnum;
         addWeapon(b->belooted());
@@ -128,7 +128,7 @@ bool warrior::emptyWeapon()
 {
     bool ret = true;
     for (auto x: weapons)
-        if (x.getNum() > 0)
+        if (x.getNum() != 0)
             ret = false;
     return ret;
 }
@@ -176,13 +176,25 @@ inline ending isend(warrior &a, warrior &b)
 {
     ending flag = con;
     if (a.vis() ^ b.vis())
+    {
         flag = die;
+        return flag;
+    }
     if (!a.vis() && !b.vis())
+    {
         flag = alldie;
-    if (a.emptyWeapon() & b.emptyWeapon())
+        return flag;
+    }
+    if (a.emptyWeapon() && b.emptyWeapon())
+    {
         flag = zeroWeapon;
+        return flag;
+    }
     if (!a.sumAtk() && !b.sumAtk())
+    {
         flag = zeroATK;
+        return flag;
+    }
     return flag;
 }
 
@@ -195,6 +207,8 @@ void warrior::beAtk(int num)
 
 void warrior::useweapon(warrior &b)
 {
+    if (emptyWeapon())
+        return;
     while (curweaponID < weapons.size() && weapons[curweaponID].getNum() == 0)
         ++curweaponID;
     if (curweaponID == weapons.size())
@@ -233,7 +247,7 @@ void warrior::fight(warrior &b)
         printf("%03d:40 %s %s %d killed %s %s %d in city %d remaining %d elements\n",
                CurHour, CampName[winner.getcamp()], WarriorName[winner.gettype()], winner.getid(),
                CampName[died.getcamp()], WarriorName[died.gettype()], died.getid(),
-               pos, Health);
+               pos, winner.Health);
         if (winner.type == dragon)
             printf("%03d:40 %s dragon %d yelled in city %d\n",
                    CurHour, CampName[winner.camp], winner.id, pos);
@@ -252,12 +266,30 @@ void warrior::fight(warrior &b)
         warrior &bluew = (this->camp == BLUE ? *this : b);
         printf("%03d:40 both red %s %d and blue %s %d were alive in city %d\n",
                CurHour, WarriorName[redw.type], redw.id, WarriorName[bluew.type], bluew.id, pos);
-        if (type == dragon)
-            printf("%03d:40 %s dragon %d yelled in city %d\n",
-                   CurHour, CampName[camp], id, pos);
-        if (b.type == dragon)
-            printf("%03d:40 %s dragon %d yelled in city %d\n",
-                   CurHour, CampName[b.camp], b.id, pos);
+        if (type == dragon && b.type == dragon)
+        {
+            if (camp == RED)
+            {
+                printf("%03d:40 %s dragon %d yelled in city %d\n",
+                       CurHour, CampName[camp], id, pos);
+                printf("%03d:40 %s dragon %d yelled in city %d\n",
+                       CurHour, CampName[b.camp], b.id, pos);
+            } else
+            {
+                printf("%03d:40 %s dragon %d yelled in city %d\n",
+                       CurHour, CampName[b.camp], b.id, pos);
+                printf("%03d:40 %s dragon %d yelled in city %d\n",
+                       CurHour, CampName[camp], id, pos);
+            }
+        } else
+        {
+            if (type == dragon)
+                printf("%03d:40 %s dragon %d yelled in city %d\n",
+                       CurHour, CampName[camp], id, pos);
+            if (b.type == dragon)
+                printf("%03d:40 %s dragon %d yelled in city %d\n",
+                       CurHour, CampName[b.camp], b.id, pos);
+        }
     }
 }
 
@@ -281,4 +313,13 @@ void Lion::check()
 bool Lion::isrun()
 {
     return WillRun;
+}
+
+void warrior::died()
+{
+    visble = false;
+    if (camp == RED)
+        citys[pos].clearRED();
+    else
+        citys[pos].clearBLUE();
 }

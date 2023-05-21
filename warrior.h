@@ -58,7 +58,7 @@ public:
     weapon belooted();
     bool emptyWeapon();
     bool sumAtk();
-    void died() { visble = false; }
+    void died();
 };
 
 class Lion : public warrior

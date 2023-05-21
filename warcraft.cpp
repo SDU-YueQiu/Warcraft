@@ -25,6 +25,7 @@ void wolf_loot();
 void rpt_bio();
 void rpt_weapon();
 bool checktime(int minu);
+void CMDwasTaken();
 
 void init()
 {
@@ -65,6 +66,11 @@ void game()
         fflush(stdout);
         if (checktime(10))
             break;
+        if (isGameEnd)
+        {
+            CMDwasTaken();
+            break;
+        }
         wolf_loot();
         fflush(stdout);
         if (checktime(35))
@@ -85,13 +91,25 @@ void game()
     }
 }
 
+void CMDwasTaken()
+{
+    if (citys[0].blueid() != -1)
+        printf("%03d:10 red headquarter was taken\n", CurHour);
+    if (citys[N + 1].redid() != -1)
+        printf("%03d:10 blue headquarter was taken\n", CurHour);
+}
+
 bool cmp(warrior *a, warrior *b)
 {
     if (b->vis() == 0)
         return true;
     if (a->vis() == 0)
         return false;
-    return a->getpos() < b->getpos();
+    if (a->getpos() != b->getpos())
+        return a->getpos() < b->getpos();
+    if (a->getcamp() == RED)
+        return true;
+    return false;
 }
 
 void delete_lion()
@@ -108,6 +126,8 @@ void delete_lion()
 inline void sortwarrior()
 {
     std::sort(AllWarrior.begin(), AllWarrior.end(), cmp);
+    while (AllWarrior.size() > 0 && !AllWarrior[AllWarrior.size() - 1]->vis())
+        AllWarrior.pop_back();
 }
 
 void march()
@@ -150,7 +170,7 @@ void fight()
     {
         if (x.redid() == -1 || x.blueid() == -1)
             continue;
-        warrior *redw, *bluew;
+        warrior *redw = nullptr, *bluew = nullptr;
         for (auto w: AllWarrior)
             if (w->vis())
             {
@@ -159,6 +179,8 @@ void fight()
                 else if (w->getcamp() == BLUE && w->getid() == x.blueid())
                     bluew = w;
             }
+        if (redw == nullptr || bluew == nullptr)
+            continue;
         if (x.getid() % 2 == 1)
             redw->fight(*bluew);
         else
@@ -172,18 +194,24 @@ void wolf_loot()
         if (x->vis() && x->gettype() == wolf)
         {
             Wolf *pw = dynamic_cast<Wolf *>(x);
-            warrior *po;
+            warrior *po = nullptr;
             if (pw->getcamp() == BLUE)
             {
                 if (citys[pw->getpos()].redid() == -1)
                     continue;
-                po = AllWarrior[citys[pw->getpos()].redid()];
+                for (auto y: AllWarrior)
+                    if (y->vis() && y->getcamp() == RED && y->getid() == citys[pw->getpos()].redid())
+                        po = y;
             } else
             {
                 if (citys[pw->getpos()].blueid() == -1)
                     continue;
-                po = AllWarrior[citys[pw->getpos()].blueid()];
+                for (auto y: AllWarrior)
+                    if (y->vis() && y->getcamp() == BLUE && y->getid() == citys[pw->getpos()].blueid())
+                        po = y;
             }
+            if (po == nullptr)
+                continue;
             pw->loot(po);
         }
 }
