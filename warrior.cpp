@@ -6,7 +6,7 @@ extern int K;
 extern int N;
 extern int M;
 extern const char WarriorName[5][10];
-extern bool gameend;
+extern bool isGameEnd;
 
 int InitHealth[5];
 int InitATK[5];
@@ -47,8 +47,6 @@ bool weapon::operator<(const weapon &b) const
 
 warrior::warrior(_WARRIOR ttype, int curid, _CAMP tcamp) : type(ttype), id(curid), visble(true), camp(tcamp)
 {
-    if (type == nulwar)
-        return;
     pos = (camp == RED ? 0 : N + 1);
     ATK = InitATK[type];
     Health = InitHealth[type];
@@ -74,12 +72,14 @@ void warrior::march()
     }
     if (camp == RED)
     {
-        citys[pos].clearRED();
+        if (citys[pos].redid() == id)
+            citys[pos].clearRED();
         pos++;
         citys[pos].add(camp, id);
     } else
     {
-        citys[pos].clearBLUE();
+        if (citys[pos].blueid() == id)
+            citys[pos].clearBLUE();
         pos--;
         citys[pos].add(camp, id);
     }
@@ -89,40 +89,16 @@ void warrior::report_march()
 {
     if ((camp == RED && pos == N + 1) || (camp == BLUE && pos == 0))
     {
-        gameend = true;
+        isGameEnd = true;
         printf("%03d:10 %s %s %d reached %s headquarter with %d elements and force %d",
                CurHour, CampName[camp], WarriorName[type], id, (camp == RED ? "blue" : "red"), Health, ATK);
     } else
         printf("%03d:10 %s %s %d marched to city %d with %d elements and force %d\n",
-               CurHour, CampName[camp], WarriorName[type], id, pos, ATK, Health);
+               CurHour, CampName[camp], WarriorName[type], id, pos, Health, ATK);
 }
 
-Lion::Lion(_WARRIOR ttype, int curid, _CAMP tcamp) : warrior(ttype, curid, tcamp), loyalty(K), WillRun(false) {}
+Lion::Lion(_WARRIOR ttype, int curid, _CAMP tcamp, int loy) : warrior(ttype, curid, tcamp), loyalty(loy), WillRun(false) {}
 
-warrior *Command::create()
-{
-    if (isStop)
-        return nullptr;
-    curid++;
-    _WARRIOR wartype = makelist[camp][CurHour % 5];
-    if (bioelement - InitHealth[wartype] < 0)
-    {
-        isStop = true;
-        return nullptr;
-    }
-    bioelement -= InitHealth[wartype];
-    warrior *pt;
-    if (wartype == lion)
-        pt = new Lion(wartype, curid, camp);
-    else if (wartype == wolf)
-        pt = new Wolf(wartype, curid, camp);
-    else
-        pt = new warrior(wartype, curid, camp);
-    printf("%03d:00 %s %s %d born\n", CurHour, CampName[camp], WarriorName[pt->gettype()], curid);
-    if (wartype == lion)
-        printf("Its loyalty is %d\n", K);
-    return pt;
-}
 
 weapon warrior::belooted()
 {
@@ -201,7 +177,7 @@ inline ending isend(warrior &a, warrior &b)
     ending flag = con;
     if (a.vis() ^ b.vis())
         flag = die;
-    if (a.vis() & b.vis())
+    if (!a.vis() && !b.vis())
         flag = alldie;
     if (a.emptyWeapon() & b.emptyWeapon())
         flag = zeroWeapon;
@@ -261,6 +237,9 @@ void warrior::fight(warrior &b)
         if (winner.type == dragon)
             printf("%03d:40 %s dragon %d yelled in city %d\n",
                    CurHour, CampName[winner.camp], winner.id, pos);
+        died.sortWeapon();
+        while (winner.weapons.size() <= 10 && !died.emptyWeapon())
+            winner.addWeapon(died.belooted());
     } else if (end == alldie)
     {
         warrior &redw = (this->camp == RED ? *this : b);
@@ -273,6 +252,12 @@ void warrior::fight(warrior &b)
         warrior &bluew = (this->camp == BLUE ? *this : b);
         printf("%03d:40 both red %s %d and blue %s %d were alive in city %d\n",
                CurHour, WarriorName[redw.type], redw.id, WarriorName[bluew.type], bluew.id, pos);
+        if (type == dragon)
+            printf("%03d:40 %s dragon %d yelled in city %d\n",
+                   CurHour, CampName[camp], id, pos);
+        if (b.type == dragon)
+            printf("%03d:40 %s dragon %d yelled in city %d\n",
+                   CurHour, CampName[b.camp], b.id, pos);
     }
 }
 
@@ -296,12 +281,4 @@ void Lion::check()
 bool Lion::isrun()
 {
     return WillRun;
-}
-
-void Command::init(_CAMP c)
-{
-    camp = c;
-    bioelement = M;
-    curid = 0;
-    isStop = false;
 }

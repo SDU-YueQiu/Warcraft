@@ -36,6 +36,7 @@ private:
     int pos;
     int curweaponID;
     void useweapon(warrior &b);
+    void beAtk(int);
 
 public:
     warrior(_WARRIOR ttype, int curid, _CAMP tcamp);
@@ -44,21 +45,20 @@ public:
     void march();
     void fight(warrior &b);
     const bool &vis() const { return visble; }
-    void died() { visble = false; }
     _CAMP getcamp() { return camp; }
     const int getid() const { return id; }
     const int getpos() const { return pos; }
     void report_march();
     const _WARRIOR &gettype() const { return type; }
-    weapon belooted();
     weapon &firstweapon() { return weapons[0]; }
     const int weaponNum() const { return weapons.size(); }
-    void sortWeapon();
+    void report_weapon();
     void addWeapon(const weapon &w) { weapons.push_back(w); }
+    void sortWeapon();
+    weapon belooted();
     bool emptyWeapon();
     bool sumAtk();
-    void beAtk(int);
-    void report_weapon();
+    void died() { visble = false; }
 };
 
 class Lion : public warrior
@@ -68,7 +68,7 @@ private:
     int loyalty;
 
 public:
-    Lion(_WARRIOR ttype, int curid, _CAMP tcamp);
+    Lion(_WARRIOR ttype, int curid, _CAMP tcamp, int loy);
     bool isrun();
     void check();
 };
