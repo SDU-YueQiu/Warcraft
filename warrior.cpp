@@ -92,6 +92,7 @@ void warrior::report_march()
         isGameEnd = true;
         printf("%03d:10 %s %s %d reached %s headquarter with %d elements and force %d\n",
                CurHour, CampName[camp], WarriorName[type], id, (camp == RED ? "blue" : "red"), Health, ATK);
+        printf("%03d:10 %s headquarter was taken\n", CurHour, (camp == RED ? "blue" : "red"));
     } else
         printf("%03d:10 %s %s %d marched to city %d with %d elements and force %d\n",
                CurHour, CampName[camp], WarriorName[type], id, pos, Health, ATK);
@@ -240,6 +241,15 @@ void warrior::fight(warrior &b)
         ++time;
     }
     ending end = isend(*this, b);
+    if (end == zeroATK)
+    {
+        for (auto &w: weapons)
+            while (w.getNum() > 0)
+                w.use();
+        for (auto &w: b.weapons)
+            while (w.getNum() > 0)
+                w.use();
+    }
     if (end == die)
     {
         warrior &winner = (this->vis() ? *this : b);
@@ -298,7 +308,8 @@ void warrior::report_weapon()
     int sum[3] = {0};
     sortWeapon();
     for (auto x: weapons)
-        sum[x.getID()]++;
+        if (x.getNum() != 0)
+            sum[x.getID()]++;
     printf("%03d:55 %s %s %d has %d sword %d bomb %d arrow and %d elements\n",
            CurHour, CampName[camp], WarriorName[type], id, sum[sword], sum[bomb], sum[arrow], Health);
 }

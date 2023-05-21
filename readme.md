@@ -4,4 +4,6 @@
 
 update:
 
-5/21 添加GUI
+5/21 修复bug
+
+添加gui待定

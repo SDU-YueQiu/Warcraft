@@ -25,7 +25,6 @@ void wolf_loot();
 void rpt_bio();
 void rpt_weapon();
 bool checktime(int minu);
-void CMDwasTaken();
 
 void init()
 {
@@ -54,49 +53,31 @@ void game()
 {
     while (!isGameEnd)
     {
-        create();
-        fflush(stdout);
         if (checktime(0))
             break;
-        delete_lion();
-        fflush(stdout);
+        create();
         if (checktime(5))
             break;
-        march();
-        fflush(stdout);
+        delete_lion();
         if (checktime(10))
             break;
+        march();
         if (isGameEnd)
-        {
-            CMDwasTaken();
             break;
-        }
-        wolf_loot();
-        fflush(stdout);
         if (checktime(35))
             break;
-        fight();
-        fflush(stdout);
+        wolf_loot();
         if (checktime(40))
             break;
-        rpt_bio();
-        fflush(stdout);
+        fight();
         if (checktime(50))
             break;
-        rpt_weapon();
-        fflush(stdout);
+        rpt_bio();
         if (checktime(55))
             break;
+        rpt_weapon();
         ++CurHour;
     }
-}
-
-void CMDwasTaken()
-{
-    if (citys[0].blueid() != -1)
-        printf("%03d:10 red headquarter was taken\n", CurHour);
-    if (citys[N + 1].redid() != -1)
-        printf("%03d:10 blue headquarter was taken\n", CurHour);
 }
 
 bool cmp(warrior *a, warrior *b)
@@ -132,7 +113,6 @@ inline void sortwarrior()
 
 void march()
 {
-
     for (auto x: AllWarrior)
         if (x->vis())
             x->march();
@@ -231,11 +211,8 @@ inline void rpt_weapon()
 
 inline bool checktime(int minu)
 {
-    int hour = T / 60;
-    int minute = T % 60;
-    if (CurHour < hour)
-        return false;
-    if (CurHour == hour && minu < minute)
+    int sum = CurHour * 60 + minu;
+    if (sum <= T)
         return false;
     isGameEnd = true;
     return true;
